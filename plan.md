@@ -23,17 +23,19 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 6 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
 | 7 | Nitro | Taster | 1 | Fahrtmodus |
 | 8 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
+| 9 | Ventilatoren An-Aus | Schalter | 1 | Schaltet Ventilatoren aus |
+| 10 | Alt-Sound | Schalter | 1 | Alternative Motorsounds |
 | 11 | Zündschloss *(nicht in der Konsole)* | Schlüsselschalter | 1 | Modus |
-| 12 | __Summe__ | | __10__ | 14 Eingänge, 1 Ausgang |
+| 12 | __Summe__ | | __13__ | 14 Eingänge, 1 Ausgang |
 | 13 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
 | 14 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
-| | __Summe mit späteren Elementen__ | | __13__ | |
+| | __Summe mit späteren Elementen__ | | __15__ | |
 
-Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 13 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 8 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
+Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 15 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 8 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
 
 ## Ausgabegeräte
 
-- Drei __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Neun Relais sind für die Ventilatoren, eins für den Fernseher, sechs bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
+- Bis zu vier __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus sein oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Neun Relais sind für die Ventilatoren, eins für den Fernseher, sechs bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
     - Pro Ventilator darf nie mehr als eine Leitung Strom gleichzeitig verbunden sein (Kurzschluss zwischen den Wicklungen). Das wird durch folgende Schaltung garantiert: Relais eins entscheidet zwischen an und Relais zwei. Relais zwei zwischen Stufe eins und Relais drei. Relais drei zwischen Stufe zwei und drei.
     - Beim Start und bei Verbindungsverlust zum Pi (kein Heartbeat für z.B. 1 s) schaltet der Arduino alle Relais aus.
     - Eine Stufe bleibt für eine Mindestdauer eingeschaltet, damit die Relais nicht klappern.
