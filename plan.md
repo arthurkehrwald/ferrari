@@ -8,7 +8,6 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
 - __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Ausgeworfen wird über die Taste am Laufwerk.
-- __Bluetooth__: Der Pi meldet sich als Bluetooth-Lautsprecher (A2DP-Sink), sodass man Musik vom Handy anstelle des CD-Laufwerks abspielen kann. Wichtig: Motorgeräusche und andere Töne werden weiterhin ausgegeben.
 
 ### Mittelkonsole
 
@@ -20,28 +19,23 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 4 | Stopp | Taster | 1 | Musik |
 | 5 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik (CD und Bluetooth) |
 | 6 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
-| 7 | Quelle CD / Bluetooth | Kippschalter | 1 | Musikquelle |
-| 8 | Musik intern / extern | Kippschalter | 1 | Audio-Routing |
-| 9 | Nitro | Taster | 1 | Fahrtmodus |
-| 10 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
-| 11 | Bluetooth-Pairing | Taster | 1 | Bluetooth |
-| 12 | Bluetooth-Pairing-LED | LED (Ausgang) | 1 | Leuchtet/blinkt während Pairing erlaubt ist |
-| 13 | Zündschloss *(nicht in der Konsole)* | Schlüsselschalter | 1 | Modus |
-| | __Summe__ | | __15__ | 14 Eingänge, 1 Ausgang |
-| 14 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
-| 15 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
-| | __Summe mit späteren Elementen__ | | __18__ | |
+| 7 | Nitro | Taster | 1 | Fahrtmodus |
+| 8 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
+| 11 | Zündschloss *(nicht in der Konsole)* | Schlüsselschalter | 1 | Modus |
+| 12 | __Summe__ | | __10__ | 14 Eingänge, 1 Ausgang |
+| 13 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
+| 14 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
+| | __Summe mit späteren Elementen__ | | __13__ | |
 
-Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 18 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 8 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
+Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 13 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 8 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
 
 ## Ausgabegeräte
 
-- Vier __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). 12 Relais sind für die Ventilatoren, 4 bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
-    - Pro Ventilator darf nie mehr als ein Stufenrelais gleichzeitig an sein (Kurzschluss zwischen den Wicklungen). Das wird im Arduino-Code erzwungen, wenn möglich auch in der Verdrahtung.
+- Drei __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Neun Relais sind für die Ventilatoren, eins für den Fernseher, sechs bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
+    - Pro Ventilator darf nie mehr als eine Leitung Strom gleichzeitig verbunden sein (Kurzschluss zwischen den Wicklungen). Das wird durch folgende Schaltung garantiert: Relais eins entscheidet zwischen an und Relais zwei. Relais zwei zwischen Stufe eins und Relais drei. Relais drei zwischen Stufe zwei und drei.
     - Beim Start und bei Verbindungsverlust zum Pi (kein Heartbeat für z.B. 1 s) schaltet der Arduino alle Relais aus.
     - Eine Stufe bleibt für eine Mindestdauer eingeschaltet, damit die Relais nicht klappern.
-- __Exciter__ (Körperschallwandler) unter der Sitzbank, angeschlossen über DAC-HAT und Verstärker. Sie machen Motor- und Fahrgeräusche und spielen alle Effekte ab, optional auch Musik (siehe Audio-Routing).
-- __Externe Lautsprecher__: Optional kann über eine USB-Soundkarte (3,5 mm Klinke) ein externes Lautsprechersystem angeschlossen werden. Darauf läuft nur Musik.
+- __Lautsprecher__: Standard 2.1 System
 - Ein monochromer __Röhrenfernseher__ mit 6 Zoll Bilddiagonale, angeschlossen über einen HDMI-HF-Adapter. Wegen der geringen Größe und des Zeilensprungs: große Schrift, dicke Linien, keine dünnen waagerechten Linien.
 - 5 bis 8 __LED-Streifen__ mit je 60 einzeln steuerbaren LEDs (5 V) hängen über der Motorhaube im rechten Winkel zur Sitzbank. Sie werden vom Pi Pico über dessen PIO-Hardware gesteuert, sodass das Auslesen der Mittelkonsole nicht gestört wird. Weil der Pico mit 3,3 V arbeitet, kommt ein Pegelwandler (z.B. 74HCT245, 8 Kanäle) zwischen Pico und Datenleitungen. Die maximale Helligkeit ist in der Konfiguration begrenzt.
 - *Später:* Eine __Nebelmaschine__, als Auspuff getarnt
@@ -52,20 +46,11 @@ Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry
 
 ### Routing
 
-| Ausgang | Hardware | Inhalt |
-|---|---|---|
-| Intern | DAC-HAT → Verstärker → Exciter | Motor, Fahrgeräusche, Effekte, Spiel; Musik, wenn Schalter auf "intern" |
-| Extern | USB-Soundkarte → 3,5 mm Klinke | Musik, wenn Schalter auf "extern" |
+DAC-HAT → Verstärker → 2x Mitteltöner, 1x Subwoofer
 
-Falls die Exciter mit Musik schlecht klingen, läuft Musik grundsätzlich nur extern und der Schalter entfällt.
-
-- Der Regler __Musik-Lautstärke__ steuert die Musik (CD und Bluetooth), der Regler __Effekt-Lautstärke__ alles andere.
+- Der Regler __Musik-Lautstärke__ steuert die Musik vom CD-Spieler, der Regler __Effekt-Lautstärke__ alles andere.
 - Beide Lautstärken werden gespeichert und gelten auch nach einem Neustart.
 - Mischen und Routen übernimmt PipeWire.
-
-### Musikquelle
-
-Der Kippschalter CD/Bluetooth bestimmt, welche Quelle zu hören ist. Die andere ist stumm. Beim Umschalten auf Bluetooth wird die CD pausiert.
 
 ### CD-Spieler
 
@@ -74,13 +59,6 @@ Der Kippschalter CD/Bluetooth bestimmt, welche Quelle zu hören ist. Die andere 
 - __Nächster/Vorheriger Track__: Track wechseln.
 - __Stopp__: Wiedergabe beenden und auf Track 1 zurücksetzen.
 - Am Ende der CD wird auf Track 1 zurückgesetzt und pausiert. Mit Play startet sie neu.
-
-### Bluetooth
-
-- Pairing ist nur nach Druck auf den __Pairing-Taster__ möglich.
-- Auf Knopfdruck wird ein verbundenes Handy getrennt und Pairing für 30 Sekunden erlaubt. Die Pairing-LED zeigt das an.
-- Pairing-Anfragen werden in diesem Zeitfenster automatisch angenommen, ohne PIN.
-- Es ist immer höchstens ein Handy verbunden.
 
 ## Steuerung
 
@@ -163,7 +141,7 @@ __Nitro__:
 - Wenn das Nitro voll ist, kann man es mit dem Nitro-Taster aktivieren. Dann ist die Leistung des Motors für kurze Zeit erhöht.
 - *Später*: Solange Nitro aktiv ist, läuft die Nebelmaschine im Auspuff.
 
-__Ton__: Die Exciter erzeugen Fahrtgeräusche basierend auf Geschwindigkeit, Gang, Drehzahl und Reifenhaftung. Dazu gehören _nicht_ Fahrtwindgeräusche, dafür sind die Ventilatoren da.
+__Ton__: Die Lautsprecher erzeugen Fahrtgeräusche basierend auf Geschwindigkeit, Gang, Drehzahl und Reifenhaftung. Dazu gehören _nicht_ Fahrtwindgeräusche, dafür sind die Ventilatoren da.
 
 __Ventilatoren__: Sie drehen sich je nach Geschwindigkeit schneller oder langsamer. Die Schwellen für die Stufen stehen in der Konfiguration.
 
@@ -235,7 +213,6 @@ Die Grafik und der Ton sind sehr einfach gehalten:
 
 ## Offene Fragen
 
-- Klingt Musik über die Exciter gut genug? Falls nicht, läuft Musik nur extern (Test steht aus).
 - Führen Vibrationen zu Aussetzern beim CD-Laufwerk? Falls ja, die CD beim Einlegen komplett in den RAM einlesen (Test steht aus).
 - LED-Streifen: Bekommt jeder Streifen eine eigene Datenleitung am Pico oder werden je zwei verkettet? In welcher Farbe leuchten die Impulse?
 - Welcher DAC-HAT genau und welche GPIOs belegt er?
