@@ -4,7 +4,7 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 
 ## Eingabegeräte
 
-- __Lenkrad und Pedale__: Ein Rennsimulator Kit (Thrustmaster T80, PC-Modus, funktioniert unter Linux) dient zur Steuerung des Autos. Pedale: Gas und Bremse, keine Kupplung. Am Lenkrad befinden sich zwei Schaltwippen (hoch-/runterschalten) und zahlreiche weitere Knöpfe (siehe Modusübergreifende Funktionen).
+- __Lenkrad und Pedale__: Ein Rennsimulator Kit (Thrustmaster T80, PC-Modus, wird unter Linux nicht als Gamepad erkannt, sondern direkt per hidraw ausgelesen, siehe t80_test.py) dient zur Steuerung des Autos. Pedale: Gas und Bremse, keine Kupplung. Am Lenkrad befinden sich zwei Schaltwippen (hoch-/runterschalten) und zahlreiche weitere Knöpfe (siehe Modusübergreifende Funktionen).
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
 - __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Ausgeworfen wird über die Taste am Laufwerk.

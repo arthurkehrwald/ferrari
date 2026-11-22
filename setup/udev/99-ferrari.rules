@@ -1,0 +1,13 @@
+# Feste Gerätenamen und Zugriffsrechte für die Ferrari-Hardware.
+
+# Thrustmaster T80: wird nur über hidraw gelesen (kein Gamepad-Treiber, siehe t80_test.py).
+# uaccess + Gruppe input: Zugriff ohne root und ohne setfacl.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="044f", ATTRS{idProduct}=="b668", MODE="0660", GROUP="input", TAG+="uaccess", SYMLINK+="ferrari-wheel"
+
+# Raspberry Pi Pico (USB-Seriell): Mittelkonsole und LED-Streifen
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2e8a", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-pico", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+# Arduino Pro Micro (USB-Seriell): Relais.
+# Je nach Board/Klon andere IDs, mit `udevadm info -a /dev/ttyACM0 | grep idVendor` prüfen.
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="1b4f", ATTRS{idProduct}=="9205|9206", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-relay", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="8036|8037", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-relay", ENV{ID_MM_DEVICE_IGNORE}="1"

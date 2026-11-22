@@ -1,0 +1,21 @@
+[Unit]
+Description=Ferrari Festival-Auto
+After=multi-user.target sound.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@REPO@
+# Direkte Ausgabe ohne Desktop (KMS/DRM)
+Environment=SDL_VIDEODRIVER=kmsdrm
+# PipeWire läuft als Benutzerdienst (linger ist aktiviert)
+Environment=XDG_RUNTIME_DIR=/run/user/@UID@
+ExecStart=@REPO@/.venv/bin/python -m ferrari
+Restart=always
+RestartSec=2
+# Erst aktivieren, wenn die Software per sd_notify("WATCHDOG=1") meldet (Type=notify):
+#WatchdogSec=10
+
+[Install]
+WantedBy=multi-user.target
