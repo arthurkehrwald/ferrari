@@ -8,6 +8,8 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
 - __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Ausgeworfen wird über die Taste am Laufwerk.
+- __An/Aus Knopf__: Schaltet den Pi und damit das gesamte Auto an und aus. Auf der Unterseite der Tischplatte.
+- __Notaus__: Unterbricht die Stromzufuhr für das gesamte Auto. Rechts von der Mittelkonsole.
 
 ### Mittelkonsole
 
@@ -82,6 +84,7 @@ Alle Einstellungen stehen in einer YAML-Datei. Dazu gehören:
 - Spieldauer, Tritte pro Truthahn und Schwellwerte der Pedale
 - Soundlisten der Lenkradknöpfe
 - Pin-Belegung
+- Dateipfade zu allen Bildern, Videos, Soundeffekten
 
 ### Persistente Daten
 
@@ -153,6 +156,14 @@ __Röhrenfernseher__:
 - Nitro-Meter als Balken
 - Abwürg-Zähler
 - Warnungen ("RUNTERSCHALTEN!", "HOCHSCHALTEN!")
+- Alle Grafiken gestalte ich selbst (Vektor oder Raster?)
+- Zwischen 200 und 250 (konfigurierbar) crossfade zwischen üblicher Anzeige und statischem Bild (Vollbild ohne Verzerrung, mit Transparenz, Pfad konfigurierbar)
+- Zwischen 250 und 280 (konfigurierbar) graduelles einblenden eines kontinierlich von links nach rechts scrollenden Bildes. Es werden zwei Kopien des Bildes dargestellt, sodass der linke Rand direkt auf den rechten Rand folgt.
+    - Volle Bildhöhe
+    - Ohne Transparenz
+    - Schwarzer Hintergrund falls doch transparent
+    - Breiter als Bildschirm
+    - Sonderfall wenn es nicht breiter ist nicht behandeln
 
 __LED-Streifen__:
 - Lichtimpulse laufen von vorne zum Fahrer hin, ihre Geschwindigkeit hängt von der virtuellen Geschwindigkeit ab.
