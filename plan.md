@@ -17,7 +17,7 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 2 | Nächster Track | Taster | 1 | Musik |
 | 3 | Vorheriger Track | Taster | 1 | Musik |
 | 4 | Stopp | Taster | 1 | Musik |
-| 5 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik (CD und Bluetooth) |
+| 5 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik |
 | 6 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
 | 7 | Nitro | Taster | 1 | Fahrtmodus |
 | 8 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
@@ -68,7 +68,7 @@ Die zentrale Kontrolleinheit des Autos ist ein Raspberry Pi 5 mit 4 GB RAM. Der 
 
 - __Python__ als Programmiersprache
 - __pygame__ für die Bildschirmausgabe
-- __PipeWire__ zum Mischen und Routen des Audios und als Bluetooth-Empfänger
+- __PipeWire__ zum Mischen und Routen des Audios
 - __Motorsound__ aus Samples, die je nach Drehzahl in der Tonhöhe verschoben und überblendet werden
 - __Mikrocontroller__: Pi Pico (Mittelkonsole und LEDs) und Arduino Pro Micro (Relais) sind per USB-Seriell angebunden, mit einem einfachen Protokoll und Heartbeat. Der Arduino Uno bleibt als Ersatzteil übrig.
 
@@ -182,13 +182,13 @@ __Spiel__:
 Die Grafik und der Ton sind sehr einfach gehalten:
 - Zwei Sprites für die Beine (ausgestreckt, gebeugt). Für die andere Seite gespiegelt.
 - Drei Sprites für den Truthahn (normal, getreten, tot). Bei einem Tritt wird kurz das Getreten-Sprite angezeigt.
-- Kurzer 8-Bit-Loop im Hintergrund. Er läuft nur, wenn über CD oder Bluetooth gerade keine Musik spielt.
+- Kurzer 8-Bit-Loop im Hintergrund. Er läuft nur, wenn über CD gerade keine Musik spielt.
 - Soundeffekte: Treten, Truthahngeschrei, Punkte bekommen, Game Over, Highscore geknackt
 
 ### Modusübergreifende Funktionen
 
 - Am Lenkrad sind zahlreiche Knöpfe, die keine sinnvolle Funktion haben. Jedem Knopf wird eine Liste aus Soundeffekten zugeordnet, die bei wiederholtem Drücken nacheinander abgespielt werden. Die Zuordnung steht in der Konfiguration.
-- Musiksteuerung und Bluetooth-Pairing funktionieren in allen Modi.
+- Musiksteuerung funktioniert in allen Modi.
 - *Später:* Die Strobo-Scheinwerfer kennen drei Betriebsarten, die per Mittelkonsole umgeschaltet werden:
     - Aus
     - An: Konstante Helligkeit
@@ -205,11 +205,10 @@ Die Grafik und der Ton sind sehr einfach gehalten:
 5. Röhrenfernseher
 6. LED-Streifen
 7. Externer Lautsprecheranschluss
-8. Bluetooth
-9. Super-Turbo-Truthahn-Kicker
+8. Super-Turbo-Truthahn-Kicker
+9. Nitro und Nebelmaschine
 10. Stroboskope
-11. Nitro und Nebelmaschine
-12. Diskokugel
+11. Diskokugel
 
 ## Offene Fragen
 
