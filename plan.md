@@ -103,7 +103,7 @@ Zurücksetzen lassen sich die Zähler nur über SSH oder mit Maus und Tastatur, 
 
 - Keine Motorengeräusche, die Ventilatoren drehen nicht.
 - Musik läuft weiterhin, die Mittelkonsole und das CD-Laufwerk bleiben aktiv.
-- Auf dem Röhrenfernseher läuft ein Video in Endlosschleife. Wenn die Pedale betätigt werden, informiert der Fernseher, dass der Motor mit dem Schlüssel gestartet werden muss.
+- Auf dem Röhrenfernseher laufen konfigurierbare Videos. Die Videos sind lokal gespeichert und werden in YAML mit Dateipfad, Displayname und Ersteller dokumentiert. Jedes Video kann einem oder mehreren tags zugeordnet werden und optional eine ID haben. Aus diesen Tags lässt sich ebenfalls in YAML ein "Fernsehprogramm" erstellen. Jeder Programmpunkt hat eine Startzeit. Wenn die Systemuhr diese Zeit erreicht, beginnt das entsprechende Programm. Ein Programm endet, wenn das nächste anfängt. Wenn es nur ein Programm gibt, wird es immer gespielt. Beim Start der Software wird das Programm ausgewählt, dessen Startzeitpunkt am kürzesten zurückliegt. Welche Videos abgespielt werden bestimmt entweder eine Liste aus Tags, aus denen zufällig Videos ausgewählt werden, oder eine Liste aus IDs, die in der angegeben Reihenfolge in Dauerschleife abgespielt werden. Es gibt einen besonderen Programmpunkt namens "Sendepause". Während einer Sendepause werden keine Videos abgespielt sondern es wird ein Bildschirmschoner angezeigt. Es ist der klassische DVD-Spieler Bildschirmschoner, bei dem ein konfigurierbares kleines Bild an den Bildschirmrändern abprallt. Beim Übergang zwischen zwei Videos oder Programmpunkten wird kurz ein rauschendes Störbild angezeigt. Nach jedem Video wird in großen Buchstaben vor schwarzem Hintergrund in zwei Zeilen "Das war \n \<Displayname>" angezeigt. Vor jedem Video dann "Es folgt \n \<Displayname>" Wenn die Pedale betätigt werden, informiert der Fernseher, dass der Motor mit dem Schlüssel gestartet werden muss.
 - Die LED-Streifen zeigen dieselben Lichtimpulse wie beim Fahren, nur sehr langsam.
 
 Dieser Modus wird aktiviert:
@@ -197,12 +197,12 @@ Die Grafik und der Ton sind sehr einfach gehalten:
 
 ## Meilensteine
 
-0. Grundgerüst: Konfiguration (YAML), Pin-Plan, Protokoll zu Pico und Pro Micro, Audio-Routing mit beiden Ausgängen in PipeWire. Entwicklung zunächst mit HDMI-Monitor.
+0. Grundgerüst: Konfiguration (YAML), Pin-Plan, Protokoll zu Pico und Pro Micro, Audio-Routing in PipeWire.
 1. Fahrsimulation ohne Ton mit Pedal und Lenkrad
 2. Ventilatoren
-3. Fahrtgeräusche erzeugen und über Pi an integrierte Lautsprecher ausgeben
+3. Fahrtgeräusche
 4. Musik per CD-Laufwerk abspielen
-5. Röhrenfernseher
+5. Röhrenfernseher (Fahrmodus, Standby-Video)
 6. LED-Streifen
 7. Externer Lautsprecheranschluss
 8. Super-Turbo-Truthahn-Kicker
