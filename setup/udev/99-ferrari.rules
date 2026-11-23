@@ -7,7 +7,10 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="044f", ATTRS{idProduct}=="b668", MODE="06
 # Raspberry Pi Pico (USB-Seriell): Mittelkonsole und LED-Streifen
 SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2e8a", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-pico", ENV{ID_MM_DEVICE_IGNORE}="1"
 
-# Arduino Pro Micro (USB-Seriell): Relais.
+# Arduino Pro Micro (USB-Seriell): Relais. Die Firmware meldet sich als Arduino Micro (2341:8037).
 # Je nach Board/Klon andere IDs, mit `udevadm info -a /dev/ttyACM0 | grep idVendor` prüfen.
 SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="1b4f", ATTRS{idProduct}=="9205|9206", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-relay", ENV{ID_MM_DEVICE_IGNORE}="1"
 SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="8036|8037", MODE="0660", GROUP="dialout", SYMLINK+="ferrari-relay", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+# Pico im Bootloader (BOOTSEL, RP2040 und RP2350): picotool ohne root
+SUBSYSTEM=="usb", ATTR{idVendor}=="2e8a", ATTR{idProduct}=="0003|000f", MODE="0660", GROUP="plugdev"

@@ -1,21 +1,21 @@
+# Benutzerdienst (systemctl --user), damit er nach PipeWire startet.
+# Läuft ohne Login dank "loginctl enable-linger". Installiert von setup.sh.
 [Unit]
 Description=Ferrari Festival-Auto
-After=multi-user.target sound.target
-Wants=sound.target
+After=pipewire.service pipewire-pulse.service wireplumber.service
+Wants=pipewire.service pipewire-pulse.service wireplumber.service
 
 [Service]
-Type=simple
-User=@USER@
+Type=notify
 WorkingDirectory=@REPO@
 # Direkte Ausgabe ohne Desktop (KMS/DRM)
 Environment=SDL_VIDEODRIVER=kmsdrm
-# PipeWire läuft als Benutzerdienst (linger ist aktiviert)
-Environment=XDG_RUNTIME_DIR=/run/user/@UID@
+Environment=PYTHONUNBUFFERED=1
 ExecStart=@REPO@/.venv/bin/python -m ferrari
 Restart=always
 RestartSec=2
-# Erst aktivieren, wenn die Software per sd_notify("WATCHDOG=1") meldet (Type=notify):
-#WatchdogSec=10
+# Die Hauptschleife meldet sich 50-mal pro Sekunde; hängt sie, startet systemd neu.
+WatchdogSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

@@ -4,10 +4,10 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 
 ## Eingabegeräte
 
-- __Lenkrad und Pedale__: Ein Rennsimulator Kit (Thrustmaster T80, PC-Modus, wird unter Linux nicht als Gamepad erkannt, sondern direkt per hidraw ausgelesen, siehe t80_test.py) dient zur Steuerung des Autos. Pedale: Gas und Bremse, keine Kupplung. Am Lenkrad befinden sich zwei Schaltwippen (hoch-/runterschalten) und zahlreiche weitere Knöpfe (siehe Modusübergreifende Funktionen).
+- __Lenkrad und Pedale__: Ein Rennsimulator Kit (Thrustmaster T80, PC-Modus, wird unter Linux nicht als Gamepad erkannt, sondern direkt per hidraw ausgelesen, siehe ferrari/devices/wheel.py) dient zur Steuerung des Autos. Pedale: Gas und Bremse, keine Kupplung. Am Lenkrad befinden sich zwei Schaltwippen (hoch-/runterschalten) und zahlreiche weitere Knöpfe (siehe Modusübergreifende Funktionen).
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
-- __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Ausgeworfen wird über die Taste am Laufwerk.
+- __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Das Laufwerk hat keine eigene Auswurftaste, ausgeworfen wird mit dem Taster an der Mittelkonsole.
 - __An/Aus Knopf__: Schaltet den Pi und damit alle anderen Komponenten an und aus. Auf der Unterseite der Tischplatte.
 - __Notaus__: Unterbricht die Stromverbindung für das gesamte Auto. Rechts von der Mittelkonsole.
 
@@ -20,27 +20,28 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 3 | Vorheriger Track | Taster | 1 | Musik |
 | 4 | Stopp | Taster | 1 | Musik |
 | 5 | Auswerfen | Taster | 1 | CD auswerfen |
-| 5 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik |
-| 6 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
-| 7 | Nitro | Taster | 1 | Fahrtmodus |
-| 8 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
-| 9 | Ventilatoren An-Aus | Schalter | 1 | Schaltet Ventilatoren aus |
-| 10 | Alt-Sound | Schalter | 1 | Alternative Motorsounds |
-| 11 | Zündschloss | Schlüsselschalter | 1 | Modus |
-| 12 | Pong-Schieberegler | 2x Schiebepotentiometer | 2 (Analog) | Pong |
-| 13 | Pong-Start/Stop | Taster | 1 | Pong |
-| 12 | __Summe__ | | __16__ | 14 Eingänge, 1 Ausgang |
-| 13 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
-| 14 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
-| | __Summe mit späteren Elementen__ | | __19__ | |
+| 6 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik |
+| 7 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
+| 8 | Nitro | Taster | 1 | Fahrtmodus |
+| 9 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
+| 10 | Ventilatoren An-Aus | Schalter | 1 | Schaltet Ventilatoren aus |
+| 11 | Alt-Sound | Schalter | 1 | Alternative Motorsounds |
+| 12 | Zündschloss | Schlüsselschalter | 1 | Modus |
+| 13 | Pong-Schieberegler | 2x Schiebepotentiometer | 2 (Analog) | Pong |
+| 14 | Pong-Start/Stop | Taster | 1 | Pong |
+| 15 | Nitro-LED (optional) | LED | 1 (Ausgang) | Zeigt an, dass Nitro bereit ist |
+| | __Summe__ | | __18__ | 17 Eingänge (davon 2 analog), 1 Ausgang |
+| 16 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
+| 17 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
+| | __Summe mit späteren Elementen__ | | __21__ | |
 
-Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 19 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 7 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
+Pinverteilung (Details in docs/pins.md, maßgeblich ist config.yaml): Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 nutzbare GPIOs: 21 für die Mittelkonsole (inklusive Nitro-LED und der späteren Elemente), 5 für die Datenleitungen der LED-Streifen. Bei mehr als fünf Streifen werden welche verkettet. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
 
 ## Ausgabegeräte
 
 - Bis zu vier __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus sein oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Bis zu 12 Relais sind für die Ventilatoren, eins für den Fernseher, mindestens drei bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
     - Pro Ventilator darf nie mehr als eine Leitung Strom gleichzeitig verbunden sein (Kurzschluss zwischen den Wicklungen). Das wird durch folgende Schaltung garantiert: Relais eins entscheidet zwischen an und Relais zwei. Relais zwei zwischen Stufe eins und Relais drei. Relais drei zwischen Stufe zwei und drei.
-    - Beim Start und bei Verbindungsverlust zum Pi (kein Heartbeat für z.B. 1 s) schaltet der Arduino alle Relais aus.
+    - Beim Start schaltet der Arduino alle Relais aus. Bei Verbindungsverlust zum Pi (1 s kein Heartbeat) schaltet er alle Relais aus außer dem Fernseher. Der behält seinen Zustand, damit er bei einem Neustart der Software nicht ausgeht.
     - Eine Stufe bleibt für eine Mindestdauer eingeschaltet, damit die Relais nicht klappern.
 - __Lautsprecher__: Standard 2.1 System
 - Ein monochromer __Röhrenfernseher__ mit 6 Zoll Bilddiagonale, angeschlossen über einen HDMI-HF-Adapter. Wegen der geringen Größe und des Zeilensprungs: große Schrift, dicke Linien, keine dünnen waagerechten Linien.
@@ -77,7 +78,7 @@ Die zentrale Kontrolleinheit des Autos ist ein Raspberry Pi 5 mit 4 GB RAM. Der 
 - __pygame__ für die Bildschirmausgabe
 - __PipeWire__ zum Mischen und Routen des Audios
 - __Motorsound__ aus Samples, die je nach Drehzahl in der Tonhöhe verschoben und überblendet werden
-- __Mikrocontroller__: Pi Pico (Mittelkonsole und LEDs) und Arduino Pro Micro (Relais) sind per USB-Seriell angebunden, mit einem einfachen Protokoll und Heartbeat. Der Arduino Uno bleibt als Ersatzteil übrig.
+- __Mikrocontroller__: Pi Pico (Mittelkonsole und LEDs, MicroPython) und Arduino Pro Micro (Relais, C++) sind per USB-Seriell angebunden, mit einem einfachen Zeilenprotokoll und Heartbeat (docs/protocol.md). Beide Firmwares lassen sich vom Pi aus aufspielen (tools/flash_pico.sh, tools/flash_relay.sh). Der Arduino Uno bleibt als Ersatzteil übrig.
 
 ### Konfiguration
 
@@ -103,7 +104,7 @@ Zurücksetzen lassen sich die Zähler nur über SSH oder mit Maus und Tastatur, 
 ### Robustheit
 
 - Schreibgeschütztes Root-Dateisystem (Overlay-FS), damit Stromausfälle die SD-Karte nicht beschädigen. Persistente Daten liegen auf einer separaten beschreibbaren Partition und werden atomar geschrieben.
-- Autostart per systemd, automatischer Neustart bei Absturz, Watchdog.
+- Autostart per systemd als Benutzerdienst (startet nach PipeWire), automatischer Neustart bei Absturz, Watchdog.
 - Lenkrad, Pico, Pro Micro, CD-Laufwerk und Soundkarte werden wieder erkannt, wenn sie ab- und wieder angesteckt werden.
 - Wartungszugang per SSH über einen WLAN-Hotspot des Pi.
 
@@ -209,7 +210,7 @@ Vor dem Fernseher ist eine Acrlyglasplatte (hauptsächlich als Schutz). An diese
 
 #### Grundprinzip
 
-Es spielen zwei Spieler gegeneinander. Das Spiel ähnelt Tischtennis in der Draufsicht. Jeder steuert mit einem Drehregler einen Schläger, der sich nur senkrecht am linken bzw. rechten Bildschirmrand bewegen lässt. Ein Ball (ein Quadrat) fliegt zwischen den Spielern hin und her. Am oberen und unteren Rand prallt er ab.
+Es spielen zwei Spieler gegeneinander. Das Spiel ähnelt Tischtennis in der Draufsicht. Jeder steuert mit einem Schieberegler einen Schläger, der sich nur senkrecht am linken bzw. rechten Bildschirmrand bewegen lässt. Ein Ball (ein Quadrat) fliegt zwischen den Spielern hin und her. Am oberen und unteren Rand prallt er ab.
 
 #### Punkte
 
@@ -252,9 +253,9 @@ Die Schläger reichen nicht ganz bis zum oberen Bildrand. Dadurch entsteht eine 
 ## Offene Fragen
 
 - Führen Vibrationen zu Aussetzern beim CD-Laufwerk? Falls ja, die CD beim Einlegen komplett in den RAM einlesen (Test steht aus).
-- LED-Streifen: Bekommt jeder Streifen eine eigene Datenleitung am Pico oder werden je zwei verkettet? In welcher Farbe leuchten die Impulse?
-- Welcher DAC-HAT genau und welche GPIOs belegt er?
-- Soll der Nitro-Taster eine LED haben, die anzeigt, dass Nitro verfügbar ist?
+- LED-Streifen: In welcher Farbe leuchten die Impulse?
+- Raspberry Pi DAC Pro (I²S an GPIO 18 bis 21, I²C an GPIO 2/3): Passt wegen des Kühlers erst mit einer höheren Stiftleiste, die noch bestellt werden muss.
+- Soll der Nitro-Taster eine LED haben, die anzeigt, dass Nitro verfügbar ist? Ein Pin ist dafür reserviert.
 - Was für Stroboskope kommen zum Einsatz und wie werden sie gesteuert? LED-Stroboskope lassen sich oft farblich einstellen und es gibt welche mit integriertem Mikrofon, die zwischen Strobo und konstanter Beleuchtung umgeschaltet werden können. Allerdings mit einer Infrarot-Fernbedienung. Muss ich die Fernbedienung mit einer Infrarot-LED imitieren oder gibt es eine bessere Alternative?
 - Was für eine Nebelmaschine und wie wird sie gesteuert? (Aufheizzeit, heiße Düse, Rauchmelder im Zelt beachten)
 - Wie werden Motor und Beleuchtung der Diskokugel an- und ausgeschaltet?

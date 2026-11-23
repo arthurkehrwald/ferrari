@@ -1,0 +1,86 @@
+# Konfiguration des Ferrari. Pins und Relais-Kanäle: siehe docs/pins.md.
+# Neue Abschnitte (Fahrphysik, Fernseher, ...) kommen mit ihren Meilensteinen dazu.
+
+persist:
+  path: /var/lib/ferrari/state.json
+  # Änderungen werden gesammelt und frühestens nach dieser Zeit geschrieben (schont die SD-Karte)
+  save_delay_s: 2.0
+
+wheel:
+  device: /dev/ferrari-wheel
+  # Pedalwerte unterhalb dieser Schwelle (0..1) gelten als "nicht betätigt"
+  pedal_deadzone: 0.03
+
+pico:
+  device: /dev/ferrari-pico
+  heartbeat_s: 0.25         # Pi -> Pico
+  timeout_s: 2.0            # Pico gilt als weg, wenn so lange nichts kommt
+  debounce_ms: 15
+  analog_smoothing: 0.2     # Glättungsfaktor (0..1, kleiner = ruhiger)
+  analog_deadband: 24       # von 4095; kleinere Änderungen werden nicht gemeldet
+
+  # Taster: Ereignis beim Drücken. Alle Eingänge schalten gegen GND (interner Pull-up).
+  buttons:
+    play: GP0
+    next: GP1
+    prev: GP2
+    stop: GP3
+    eject: GP4
+    nitro: GP5
+    turkey: GP6
+    pong: GP7
+  # Schalter: Zustand zählt. Das Zündschloss wird als Taster ausgewertet (jeder Wechsel).
+  switches:
+    fans: GP8
+    alt_sound: GP9
+    ignition: GP10
+    # später:
+    # strobe_on: GP15
+    # strobe_mode: GP16
+    # disco: GP17
+  encoders:
+    music_volume: [GP11, GP12]
+    effects_volume: [GP13, GP14]
+  # Nur GP26..GP28 haben einen ADC
+  analog:
+    pong_left: GP26
+    pong_right: GP27
+  outputs:
+    nitro_led: GP28
+  leds:
+    # Datenleitungen über den 74HCT245. Bei verketteten Streifen count = Summe.
+    lines:
+      - {pin: GP18, count: 60}
+      - {pin: GP19, count: 60}
+      - {pin: GP20, count: 60}
+      - {pin: GP21, count: 60}
+      - {pin: GP22, count: 60}
+    # 0..1, wird auch in der Pico-Firmware erzwungen
+    max_brightness: 0.3
+
+relay:
+  device: /dev/ferrari-relay
+  heartbeat_s: 0.2          # Die Firmware schaltet nach 1 s ohne Nachricht ab
+  timeout_s: 1.0
+  # Kanalnummern 0..15 auf dem Relaisboard. Ventilator: [an/aus, Stufe 1 / weiter, Stufe 2 / 3]
+  fans:
+    - [0, 1, 2]
+    - [3, 4, 5]
+    - [6, 7, 8]
+    - [9, 10, 11]
+  tv: 12
+  # Frei: 13, 14, 15 (Strobos, Nebelmaschine, Diskokugel)
+  # Diese Geräte behalten bei Verbindungsverlust zum Pi ihren Zustand
+  keep_on_timeout: [tv]
+
+audio:
+  # Virtuelle PipeWire-Sinks aus setup/pipewire/
+  sinks:
+    music: ferrari-music
+    effects: ferrari-effects
+  # Lautstärkeänderung pro Raststufe des Drehgebers (0..1)
+  volume_step: 0.03
+  encoder_steps_per_detent: 4
+  default_volume:
+    music: 0.5
+    effects: 0.5

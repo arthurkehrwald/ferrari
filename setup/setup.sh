@@ -17,7 +17,7 @@ fi
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 USER_NAME="$(id -un)"
-USER_ID="$(id -u)"
+ARDUINO_CLI_VERSION=1.5.1
 CONFIG=/boot/firmware/config.txt
 MARK_BEGIN="# >>> ferrari >>>"
 MARK_END="# <<< ferrari <<<"
@@ -28,20 +28,21 @@ log "Pakete installieren"
 sudo apt-get update
 sudo apt-get -y full-upgrade
 sudo apt-get -y install \
-    git acl alsa-utils \
+    git acl alsa-utils rsync curl \
     python3-venv python3-pygame python3-yaml python3-serial \
-    pipewire pipewire-pulse pipewire-alsa wireplumber
+    pipewire pipewire-pulse pipewire-alsa wireplumber pulseaudio-utils \
+    picotool
 
 log "Benutzergruppen"
 sudo usermod -aG input,dialout,audio,video,render,cdrom "$USER_NAME"
 
-log "DAC Pro (iqaudio-dacplus) in $CONFIG"
+log "Raspberry Pi DAC Pro (rpi-dacpro) in $CONFIG"
 # Eingebautes Audio aus, Pi 5 hat ohnehin keine Klinkenbuchse.
 sudo sed -i 's/^dtparam=audio=on/dtparam=audio=off/' "$CONFIG"
 sudo sed -i "/^$MARK_BEGIN\$/,/^$MARK_END\$/d" "$CONFIG"
 sudo tee -a "$CONFIG" >/dev/null <<EOF
 $MARK_BEGIN
-dtoverlay=iqaudio-dacplus
+dtoverlay=rpi-dacpro
 # Hardware-Watchdog des SoC
 dtparam=watchdog=on
 $MARK_END
@@ -59,22 +60,42 @@ printf '[Manager]\nRuntimeWatchdogSec=15\n' | sudo tee /etc/systemd/system.conf.
 log "PipeWire auch ohne Login-Session"
 sudo loginctl enable-linger "$USER_NAME"
 
+log "PipeWire-Routing (virtuelle Sinks, HDMI-Audio aus)"
+sudo install -D -m 644 "$REPO/setup/pipewire/50-ferrari.conf" /etc/pipewire/pipewire.conf.d/50-ferrari.conf
+sudo install -D -m 644 "$REPO/setup/wireplumber/50-ferrari.conf" /etc/wireplumber/wireplumber.conf.d/50-ferrari.conf
+systemctl --user restart pipewire pipewire-pulse wireplumber || echo "PipeWire-Neustart fehlgeschlagen, greift nach dem Reboot"
+
 log "Python-venv"
 python3 -m venv --system-site-packages "$REPO/.venv"
 if [[ -f "$REPO/requirements.txt" ]]; then
     "$REPO/.venv/bin/pip" install -r "$REPO/requirements.txt"
 fi
 
+log "arduino-cli $ARDUINO_CLI_VERSION (Firmware für den Pro Micro)"
+mkdir -p "$HOME/.local/bin"
+if ! "$HOME/.local/bin/arduino-cli" version 2>/dev/null | grep -q "Version: $ARDUINO_CLI_VERSION"; then
+    curl -fsSL "https://github.com/arduino/arduino-cli/releases/download/v$ARDUINO_CLI_VERSION/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_ARM64.tar.gz" \
+        | tar -xz -C "$HOME/.local/bin" arduino-cli
+fi
+"$HOME/.local/bin/arduino-cli" core update-index
+"$HOME/.local/bin/arduino-cli" core install arduino:avr
+
 log "Persistentes Datenverzeichnis"
 # Wird von harden.sh bei Bedarf durch eine eigene Partition ersetzt.
 sudo mkdir -p /var/lib/ferrari
 sudo chown "$USER_NAME": /var/lib/ferrari
 
-log "systemd-Dienst installieren (noch nicht aktiviert)"
-sed -e "s|@USER@|$USER_NAME|g" -e "s|@UID@|$USER_ID|g" -e "s|@REPO@|$REPO|g" \
-    "$REPO/setup/systemd/ferrari.service" | sudo tee /etc/systemd/system/ferrari.service >/dev/null
-sudo systemctl daemon-reload
-echo "Aktivieren, sobald die Software existiert:  sudo systemctl enable --now ferrari"
+log "systemd-Benutzerdienst installieren (noch nicht aktiviert)"
+# Früher ein Systemdienst; der läuft vor PipeWire los und wird deshalb entfernt.
+if [[ -f /etc/systemd/system/ferrari.service ]]; then
+    sudo systemctl disable --now ferrari.service || true
+    sudo rm /etc/systemd/system/ferrari.service
+    sudo systemctl daemon-reload
+fi
+sed -e "s|@REPO@|$REPO|g" "$REPO/setup/systemd/ferrari.service" \
+    | sudo tee /etc/systemd/user/ferrari.service >/dev/null
+systemctl --user daemon-reload
+echo "Autostart aktivieren:  systemctl --user enable --now ferrari"
 
 if [[ "${HOTSPOT:-0}" == "1" ]]; then
     log "WLAN-Hotspot"
@@ -96,4 +117,4 @@ echo "Danach prüfen:"
 echo "  aplay -l                      # DAC Pro muss auftauchen"
 echo "  wpctl status                  # PipeWire sieht den DAC"
 echo "  ls -l /dev/ferrari-*          # Lenkrad, Pico, Pro Micro"
-echo "  python3 t80_test.py           # Lenkrad ohne setfacl"
+echo "  .venv/bin/python -m tools.monitor   # alle Eingänge live"
