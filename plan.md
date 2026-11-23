@@ -8,10 +8,10 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
 - __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Ausgeworfen wird über die Taste am Laufwerk.
-- __An/Aus Knopf__: Schaltet den Pi und damit das gesamte Auto an und aus. Auf der Unterseite der Tischplatte.
-- __Notaus__: Unterbricht die Stromzufuhr für das gesamte Auto. Rechts von der Mittelkonsole.
+- __An/Aus Knopf__: Schaltet den Pi und damit alle anderen Komponenten an und aus. Auf der Unterseite der Tischplatte.
+- __Notaus__: Unterbricht die Stromverbindung für das gesamte Auto. Rechts von der Mittelkonsole.
 
-### Mittelkonsole
+### Weitere Bedienelemente
 
 | # | Element | Typ | Pins | Funktion |
 |---|---|---|---|---|
@@ -19,23 +19,26 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 2 | Nächster Track | Taster | 1 | Musik |
 | 3 | Vorheriger Track | Taster | 1 | Musik |
 | 4 | Stopp | Taster | 1 | Musik |
+| 5 | Auswerfen | Taster | 1 | CD auswerfen |
 | 5 | Musik-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke der Musik |
 | 6 | Effekt-Lautstärke | Inkrementalgeber (A/B) | 2 | Lautstärke von allem außer Musik |
 | 7 | Nitro | Taster | 1 | Fahrtmodus |
 | 8 | Truthahn-Kicker | Taster | 1 | Startet das Spiel |
 | 9 | Ventilatoren An-Aus | Schalter | 1 | Schaltet Ventilatoren aus |
 | 10 | Alt-Sound | Schalter | 1 | Alternative Motorsounds |
-| 11 | Zündschloss *(nicht in der Konsole)* | Schlüsselschalter | 1 | Modus |
-| 12 | __Summe__ | | __13__ | 14 Eingänge, 1 Ausgang |
+| 11 | Zündschloss | Schlüsselschalter | 1 | Modus |
+| 12 | Pong-Schieberegler | 2x Schiebepotentiometer | 2 (Analog) | Pong |
+| 13 | Pong-Start/Stop | Taster | 1 | Pong |
+| 12 | __Summe__ | | __16__ | 14 Eingänge, 1 Ausgang |
 | 13 | *später:* Strobo-Modus | Schalter, 3 Stellungen | 2 | Aus / An / Strobo |
 | 14 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
-| | __Summe mit späteren Elementen__ | | __15__ | |
+| | __Summe mit späteren Elementen__ | | __19__ | |
 
-Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 15 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 8 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
+Pinverteilung: Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 GPIOs: 19 für die Mittelkonsole (inklusive der späteren Elemente), bis zu 7 für die Datenleitungen der LED-Streifen. Werden je zwei Streifen verkettet, bleiben Pins frei. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
 
 ## Ausgabegeräte
 
-- Bis zu vier __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus sein oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Neun Relais sind für die Ventilatoren, eins für den Fernseher, sechs bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
+- Bis zu vier __Ventilatoren__ erzeugen Fahrtwind. Sie blasen alle geradeaus. Jeder Ventilator kann aus sein oder auf einer von drei Stufen laufen. Gesteuert werden sie über ein Relaisboard mit 16 Relais, das an einem Arduino Pro Micro hängt (USB-Seriell zum Pi). Bis zu 12 Relais sind für die Ventilatoren, eins für den Fernseher, mindestens drei bleiben frei für Strobos, Nebelmaschine und Diskokugel. Sicherheitsregeln:
     - Pro Ventilator darf nie mehr als eine Leitung Strom gleichzeitig verbunden sein (Kurzschluss zwischen den Wicklungen). Das wird durch folgende Schaltung garantiert: Relais eins entscheidet zwischen an und Relais zwei. Relais zwei zwischen Stufe eins und Relais drei. Relais drei zwischen Stufe zwei und drei.
     - Beim Start und bei Verbindungsverlust zum Pi (kein Heartbeat für z.B. 1 s) schaltet der Arduino alle Relais aus.
     - Eine Stufe bleibt für eine Mindestdauer eingeschaltet, damit die Relais nicht klappern.
@@ -108,8 +111,10 @@ Zurücksetzen lassen sich die Zähler nur über SSH oder mit Maus und Tastatur, 
 
 - Keine Motorengeräusche, die Ventilatoren drehen nicht.
 - Musik läuft weiterhin, die Mittelkonsole und das CD-Laufwerk bleiben aktiv.
-- Auf dem Röhrenfernseher laufen konfigurierbare Videos. Die Videos sind lokal gespeichert und werden in YAML mit Dateipfad, Displayname und Ersteller dokumentiert. Jedes Video kann einem oder mehreren tags zugeordnet werden und optional eine ID haben. Aus diesen Tags lässt sich ebenfalls in YAML ein "Fernsehprogramm" erstellen. Jeder Programmpunkt hat eine Startzeit. Wenn die Systemuhr diese Zeit erreicht, beginnt das entsprechende Programm. Ein Programm endet, wenn das nächste anfängt. Wenn es nur ein Programm gibt, wird es immer gespielt. Beim Start der Software wird das Programm ausgewählt, dessen Startzeitpunkt am kürzesten zurückliegt. Welche Videos abgespielt werden bestimmt entweder eine Liste aus Tags, aus denen zufällig Videos ausgewählt werden, oder eine Liste aus IDs, die in der angegeben Reihenfolge in Dauerschleife abgespielt werden. Es gibt einen besonderen Programmpunkt namens "Sendepause". Während einer Sendepause werden keine Videos abgespielt sondern es wird ein Bildschirmschoner angezeigt. Es ist der klassische DVD-Spieler Bildschirmschoner, bei dem ein konfigurierbares kleines Bild an den Bildschirmrändern abprallt. Beim Übergang zwischen zwei Videos oder Programmpunkten wird kurz ein rauschendes Störbild angezeigt. Nach jedem Video wird in großen Buchstaben vor schwarzem Hintergrund in zwei Zeilen "Das war \n \<Displayname>" angezeigt. Vor jedem Video dann "Es folgt \n \<Displayname>" Wenn die Pedale betätigt werden, informiert der Fernseher, dass der Motor mit dem Schlüssel gestartet werden muss.
 - Die LED-Streifen zeigen dieselben Lichtimpulse wie beim Fahren, nur sehr langsam.
+
+#### Fernseher
+Auf dem Röhrenfernseher laufen konfigurierbare Videos. Die Videos sind lokal gespeichert und werden in YAML mit Dateipfad, Displayname und Ersteller dokumentiert. Jedes Video kann einem oder mehreren Tags zugeordnet werden und optional eine ID haben. Aus diesen Tags und IDs lässt sich ebenfalls in YAML ein "Fernsehprogramm" erstellen. Jeder Programmpunkt hat eine Startzeit. Wenn die Systemuhr diese Zeit erreicht, beginnt das entsprechende Programm. Ein Programm endet, wenn das nächste anfängt. Wenn es nur ein Programm gibt, wird es immer gespielt. Wenn der Standbymodus startet, wird das Programm ausgewählt, dessen Startzeitpunkt am kürzesten zurückliegt. Welche Videos abgespielt werden bestimmt entweder eine Liste aus Tags, aus denen zufällig Videos ausgewählt werden, oder eine Liste aus IDs, die in der angegeben Reihenfolge in Dauerschleife abgespielt werden. Es gibt einen besonderen Programmpunkt ohne Ersteller und ohne ID- oder Tag-Liste: Die Sendepause. Während einer Sendepause werden keine Videos abgespielt sondern es wird ein Bildschirmschoner angezeigt. Es ist der klassische DVD-Spieler Bildschirmschoner, bei dem ein konfigurierbares kleines Bild vor schwarzem Hintergrund mit konstanter Geschwindigkeit über den Bildschirm wandert und an den Bildschirmrändern abprallt. Beim Übergang zwischen zwei Videos oder Programmpunkten wird kurz ein rauschendes Störbild angezeigt. Nach jedem Video wird in großen Buchstaben vor schwarzem Hintergrund in vier Zeilen "Das war\n\<Displayname>\nvon\n\<Ersteller>" angezeigt. Vor jedem Video dann "Es folgt\n\<Displayname>\nvon\n\<Ersteller>". Dabei sind Displayname und Ersteller in deutlich größerer Schrift. Wenn die Pedale betätigt werden, informiert der Fernseher, dass der Motor mit dem Schlüssel gestartet werden muss.
 
 Dieser Modus wird aktiviert:
 
@@ -198,6 +203,26 @@ Die Grafik und der Ton sind sehr einfach gehalten:
 - Kurzer 8-Bit-Loop im Hintergrund. Er läuft nur, wenn über CD gerade keine Musik spielt.
 - Soundeffekte: Treten, Truthahngeschrei, Punkte bekommen, Game Over, Highscore geknackt
 
+### Pong-Modus
+
+Vor dem Fernseher ist eine Acrlyglasplatte (hauptsächlich als Schutz). An dieser Platte sind zwei Schiebepotentiometer und ein Taster befestigt. Mit dem Taster kann der Pong-Modus gestartet und beendet werden. Nach 30 Sekunden ohne Bewegung an den Potentiometern wird der Pong-Modus automatisch beendet. Die Schiebepotentiometer bewegen die beiden "Schläger" an den Bildschirmrändern. Die Position der Potentiometer wird direkt auf die virtuellen Schläger übertragen. Möglicherweise muss der analoge Input geglättet werden, damit die Schläger nicht zittern. Ansonsten entsprechen die Regeln und auch Bild und Ton dem Original:
+
+#### Grundprinzip
+
+Es spielen zwei Spieler gegeneinander. Das Spiel ähnelt Tischtennis in der Draufsicht. Jeder steuert mit einem Drehregler einen Schläger, der sich nur senkrecht am linken bzw. rechten Bildschirmrand bewegen lässt. Ein Ball (ein Quadrat) fliegt zwischen den Spielern hin und her. Am oberen und unteren Rand prallt er ab.
+
+#### Punkte
+
+Verpasst ein Spieler den Ball und dieser fliegt am Schläger vorbei, bekommt der Gegner einen Punkt Danach wird der Ball neu aufgeschlagen. Wer zuerst 11 Punkte hat, gewinnt.
+
+#### Ballphysik
+
+Der Abprallwinkel hängt davon ab, wo der Ball den Schläger trifft. Treffer in der Mitte schicken den Ball flach zurück, Treffer am Rand lenken ihn steiler ab. Der Ball wird im Laufe eines Ballwechsels schneller. Nach einer bestimmten Anzahl an Treffern in Folge zieht das Tempo an, bis es kaum noch zu halten ist.
+
+#### Eigenheit der Original-Hardware
+
+Die Schläger reichen nicht ganz bis zum oberen Bildrand. Dadurch entsteht eine kleine Lücke, in der ein Ball nicht zu erreichen ist. Das gilt als bekannter Quirk des Originals, weil es lange Ballwechsel begrenzt.
+
 ### Modusübergreifende Funktionen
 
 - Am Lenkrad sind zahlreiche Knöpfe, die keine sinnvolle Funktion haben. Jedem Knopf wird eine Liste aus Soundeffekten zugeordnet, die bei wiederholtem Drücken nacheinander abgespielt werden. Die Zuordnung steht in der Konfiguration.
@@ -214,14 +239,15 @@ Die Grafik und der Ton sind sehr einfach gehalten:
 1. Fahrsimulation ohne Ton mit Pedal und Lenkrad
 2. Ventilatoren
 3. Fahrtgeräusche
-4. Musik per CD-Laufwerk abspielen
+4. Musik per CD-Laufwerk abspielen und mit Buttons steuern
 5. Röhrenfernseher (Fahrmodus, Standby-Video)
 6. LED-Streifen
-7. Externer Lautsprecheranschluss
+7. Pong
 8. Super-Turbo-Truthahn-Kicker
-9. Nitro und Nebelmaschine
-10. Stroboskope
-11. Diskokugel
+9. Lenkrad-Soundeffekte
+10. Nitro und Nebelmaschine
+11. Stroboskope
+12. Diskokugel
 
 ## Offene Fragen
 
