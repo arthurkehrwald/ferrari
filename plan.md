@@ -86,7 +86,7 @@ Alle Einstellungen stehen in einer YAML-Datei. Dazu gehören:
 - Spieldauer, Tritte pro Truthahn und Schwellwerte der Pedale
 - Soundlisten der Lenkradknöpfe
 - Pin-Belegung
-- Dateipfade zu allen Bildern, Videos, Soundeffekten
+- Dateipfade zu allen Bildern, Videos, Soundeffekten, Schriftarten
 
 ### Persistente Daten
 
