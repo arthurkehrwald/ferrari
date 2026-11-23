@@ -40,13 +40,17 @@ Einschränkungen:
 - **Potis** zwischen 3V3 (Pin 36) und AGND (Pin 33) anschließen, nicht an 5 V. Lange
   Leitungen zur Acrylglasplatte: verdrillt oder abgeschirmt führen, die Firmware glättet
   zusätzlich (`analog_smoothing`, `analog_deadband`).
-- **LED-Streifen:** Fünf Leitungen reichen für fünf Streifen. Für mehr werden Streifen verkettet
-  (`count` der Leitung = Summe der LEDs). Bei 8 Streifen also drei Leitungen mit je 120 und zwei mit je 60 LEDs.
+- **LED-Streifen:** Zehn Streifen mit je 60 LEDs, je zwei Rücken an Rücken. Die beiden Streifen
+  eines Paars hängen **parallel** an derselben Datenleitung und zeigen dasselbe, `count` bleibt 60.
+  Jeder Streifen bekommt einen eigenen 330-Ω-Widerstand in der Datenleitung, nah am Streifen.
+  Sollen die Seiten getrennt leuchten, müssten die Streifen verkettet werden (`count` = 120).
   Der 74HCT245 braucht 5 V Versorgung, `DIR` fest auf High, `OE` fest auf GND.
 - **Pull-downs an den Eingängen des 74HCT245** (je 10 kΩ gegen GND). Bis die Firmware läuft,
   sind die Pico-Pins offen, und Störungen würden als zufällige LED-Daten durchgereicht.
-- **LED-Strom:** 60 LEDs ziehen bei vollem Weiß bis zu 3,6 A. `max_brightness` begrenzt das.
-  Ab Meilenstein 6 erzwingt auch die Pico-Firmware diese Grenze (sie bekommt sie per CFG).
+- **LED-Strom:** Genutzt wird nur Rot (≈ 20 mA pro LED). Eine Leitung mit zwei Streifen zieht
+  damit höchstens 2,4 A, bei `max_brightness` 0,3 etwa 0,7 A. Ab Meilenstein 6 erzwingt die
+  Pico-Firmware die Helligkeitsgrenze und setzt Grün und Blau fest auf 0. Versorgung und
+  Sicherungen: [power.md](power.md).
 
 ## Arduino Pro Micro (Relais)
 
@@ -91,4 +95,37 @@ Phase ── R1 ──NC── (aus)
 
 ## Raspberry Pi 5
 
-Die GPIO-Leiste gehört allein dem DAC Pro (I²S an GPIO 18 – 21, I²C an GPIO 2/3).
+| GPIO | Verwendung |
+|---|---|
+| 2, 3 | DAC Pro (I²C) |
+| 18 – 21 | DAC Pro (I²S) |
+| 10 (MOSI), 11 (SCLK), 8 (CE0) | LED-Matrix über SPI0 und 74AHCT125 |
+| 17 (Pin 11) | Netzrelais für RS-150-5 und Verstärker (High = an), siehe [power.md](power.md) |
+
+### LED-Matrix
+
+Zwei MAX7219-Module „4 in 1“ (je 32×8), hintereinander: DOUT des ersten an DIN des zweiten,
+CLK und CS parallel. Ergibt 64×8 Pixel. Versorgung mit 5 V aus dem RS-150-5, nicht vom Pi
+([power.md](power.md)). SPI muss in `config.txt` aktiviert werden (`dtparam=spi=on`), das kommt
+mit der Software für die Matrix ins Setup-Skript.
+
+Der MAX7219 braucht bei 5 V mindestens 3,5 V als High. Deshalb ein SN74AHCT125N (DIP-14) als
+Pegelwandler, versorgt mit 5 V:
+
+| Pin | Funktion | Anschluss |
+|---|---|---|
+| 14 | VCC | 5 V, 100 nF nach GND direkt am Chip |
+| 7 | GND | GND (gemeinsam mit Pi und Netzteil) |
+| 1, 4, 10 | 1OE, 2OE, 3OE | GND (Ausgänge immer aktiv) |
+| 2 → 3 | 1A → 1Y | GPIO 10 (MOSI) → DIN |
+| 5 → 6 | 2A → 2Y | GPIO 11 (SCLK) → CLK |
+| 9 → 8 | 3A → 3Y | GPIO 8 (CE0) → CS |
+| 12, 13 | 4A, 4OE (unbenutzt) | beide an GND |
+| 11 | 4Y | offen |
+
+- Bei mehr als etwa 30 cm vom Pegelwandler zur Matrix: 47 – 100 Ω in Reihe direkt an den
+  Ausgängen (Pins 3, 6, 8).
+- Beim Booten liegen undefinierte Pegel an. Das ist harmlos: Der MAX7219 startet dunkel und
+  zeigt erst nach der Initialisierung etwas an.
+- Günstige Module haben oft MAX7219-Klone. Bei Fehlern den SPI-Takt senken (z.B. 1 MHz).
+  Manche Chargen haben gedreht oder gespiegelt eingelötete Matrizen, das gleicht die Software aus.

@@ -48,7 +48,8 @@ pico:
   outputs:
     nitro_led: GP28
   leds:
-    # Datenleitungen über den 74HCT245. Bei verketteten Streifen count = Summe.
+    # Datenleitungen über den 74HCT245. Je zwei Streifen parallel (Rücken an Rücken),
+    # daher 60. Bei verketteten Streifen wäre count die Summe.
     lines:
       - {pin: GP18, count: 60}
       - {pin: GP19, count: 60}

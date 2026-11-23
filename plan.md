@@ -8,7 +8,7 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 - __Zündschloss__: Ein Schlüsselschalter, der nach dem Drehen in seiner Stellung bleibt. Die Software wertet jeden Wechsel der Schalterstellung (egal in welche Richtung) als eine Betätigung, wie einen kurzen Tastendruck. Die Stellung beim Booten spielt keine Rolle.
 - __Mittelkonsole__: Schalter, Taster und Inkrementalgeber, siehe Tabelle unten.
 - __CD-Laufwerk__: USB-Laufwerk zum Abspielen handelsüblicher Audio-CDs. Das Laufwerk hat keine eigene Auswurftaste, ausgeworfen wird mit dem Taster an der Mittelkonsole.
-- __An/Aus Knopf__: Schaltet den Pi und damit alle anderen Komponenten an und aus. Auf der Unterseite der Tischplatte.
+- __An/Aus Knopf__: Schaltet den Pi und damit alle anderen Komponenten an und aus. Auf der Unterseite der Tischplatte. Der Pi schaltet über ein Netzrelais das 5-V-Netzteil und den Verstärker; ohne 5 V fallen auch alle Relais ab (Details in docs/power.md).
 - __Notaus__: Unterbricht die Stromverbindung für das gesamte Auto. Rechts von der Mittelkonsole.
 
 ### Weitere Bedienelemente
@@ -35,7 +35,7 @@ Ein "Auto" für ein Festival. Es ist eine einfache Konstruktion aus Holz und Alu
 | 17 | *später:* Diskokugel | Kippschalter | 1 | An / Aus |
 | | __Summe mit späteren Elementen__ | | __21__ | |
 
-Pinverteilung (Details in docs/pins.md, maßgeblich ist config.yaml): Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 nutzbare GPIOs: 21 für die Mittelkonsole (inklusive Nitro-LED und der späteren Elemente), 5 für die Datenleitungen der LED-Streifen. Bei mehr als fünf Streifen werden welche verkettet. Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 werden nur vom DAC-HAT belegt und sind von der Konsolenverkabelung getrennt.
+Pinverteilung (Details in docs/pins.md, maßgeblich ist config.yaml): Die Mittelkonsole und die LED-Streifen hängen an einem Raspberry Pi Pico, der per USB-Seriell mit dem Pi verbunden ist. Der Pico hat 26 nutzbare GPIOs: 21 für die Mittelkonsole (inklusive Nitro-LED und der späteren Elemente), 5 für die Datenleitungen der LED-Streifen (je zwei Streifen parallel an einer Leitung). Die Relais hängen an einem Arduino Pro Micro, ebenfalls per USB. Die GPIOs des Pi 5 belegen nur der DAC-HAT und die LED-Matrix (SPI) und sind von der Konsolenverkabelung getrennt.
 
 ## Ausgabegeräte
 
@@ -45,7 +45,8 @@ Pinverteilung (Details in docs/pins.md, maßgeblich ist config.yaml): Die Mittel
     - Eine Stufe bleibt für eine Mindestdauer eingeschaltet, damit die Relais nicht klappern.
 - __Lautsprecher__: Standard 2.1 System
 - Ein monochromer __Röhrenfernseher__ mit 6 Zoll Bilddiagonale, angeschlossen über einen HDMI-HF-Adapter. Wegen der geringen Größe und des Zeilensprungs: große Schrift, dicke Linien, keine dünnen waagerechten Linien.
-- 5 bis 8 __LED-Streifen__ mit je 60 einzeln steuerbaren LEDs (5 V) hängen über der Motorhaube im rechten Winkel zur Sitzbank. Sie werden vom Pi Pico über dessen PIO-Hardware gesteuert, sodass das Auslesen der Mittelkonsole nicht gestört wird. Weil der Pico mit 3,3 V arbeitet, kommt ein Pegelwandler (z.B. 74HCT245, 8 Kanäle) zwischen Pico und Datenleitungen. Die maximale Helligkeit ist in der Konfiguration begrenzt.
+- 10 __LED-Streifen__ mit je 60 einzeln steuerbaren LEDs (WS2812B, 5 V, 1 m) hängen über der Motorhaube im rechten Winkel zur Sitzbank. Je zwei sind Rücken an Rücken verklebt und zeigen dasselbe. Sie leuchten nur rot. Sie werden vom Pi Pico über dessen PIO-Hardware gesteuert, sodass das Auslesen der Mittelkonsole nicht gestört wird. Weil der Pico mit 3,3 V arbeitet, kommt ein Pegelwandler (z.B. 74HCT245, 8 Kanäle) zwischen Pico und Datenleitungen. Die maximale Helligkeit ist in der Konfiguration begrenzt.
+- Eine __LED-Matrix__ mit 64×8 roten Pixeln (zwei MAX7219-Module 4-in-1) am SPI des Pi, über einen Pegelwandler (74AHCT125). Was sie anzeigt, ist noch offen.
 - *Später:* Eine __Nebelmaschine__, als Auspuff getarnt
 - *Später:* Vier __Stroboskope__, zwei vorne in weiß, zwei hinten in rot
 - *Später:* Eine __Diskokugel__, motorisiert und beleuchtet
@@ -86,7 +87,7 @@ Alle Einstellungen stehen in einer YAML-Datei. Dazu gehören:
 - Timings und Timeouts
 - Fahrphysik: Beschleunigung, Bremsen, Luftwiderstand, Übersetzungen, Drehzahlgrenzen, Nitro-Dauer und -Leistung
 - Geschwindigkeitsschwellen für die Ventilatorstufen
-- LED-Farben, -Helligkeit und Impulsgeschwindigkeit
+- LED-Helligkeit und Impulsgeschwindigkeit
 - Spieldauer, Tritte pro Truthahn und Schwellwerte der Pedale
 - Soundlisten der Lenkradknöpfe
 - Pin-Belegung
@@ -253,7 +254,7 @@ Die Schläger reichen nicht ganz bis zum oberen Bildrand. Dadurch entsteht eine 
 ## Offene Fragen
 
 - Führen Vibrationen zu Aussetzern beim CD-Laufwerk? Falls ja, die CD beim Einlegen komplett in den RAM einlesen (Test steht aus).
-- LED-Streifen: In welcher Farbe leuchten die Impulse?
+- Was zeigt die LED-Matrix, und in welchem Meilenstein kommt sie dazu?
 - Raspberry Pi DAC Pro (I²S an GPIO 18 bis 21, I²C an GPIO 2/3): Passt wegen des Kühlers erst mit einer höheren Stiftleiste, die noch bestellt werden muss.
 - Soll der Nitro-Taster eine LED haben, die anzeigt, dass Nitro verfügbar ist? Ein Pin ist dafür reserviert.
 - Was für Stroboskope kommen zum Einsatz und wie werden sie gesteuert? LED-Stroboskope lassen sich oft farblich einstellen und es gibt welche mit integriertem Mikrofon, die zwischen Strobo und konstanter Beleuchtung umgeschaltet werden können. Allerdings mit einer Infrarot-Fernbedienung. Muss ich die Fernbedienung mit einer Infrarot-LED imitieren oder gibt es eine bessere Alternative?

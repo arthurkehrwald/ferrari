@@ -223,6 +223,43 @@ auch wenn die Sinks zwischendurch verstellt wurden.
 - `t80_test.py` ist entfernt. `tools/monitor.py` zeigt Lenkrad, Pedale, alle Konsoleneingänge und
   die Relais live an und kann Relais schalten.
 
+## Hardware
+
+Entschieden nach Meilenstein 0. Details: [power.md](power.md), [parts.md](parts.md),
+[pins.md](pins.md).
+
+- **Ein 5-V-Netzteil (Mean Well RS-150-5) für alles außer dem Pi:** LED-Streifen, LED-Matrix,
+  Relaisboard, HF-Modulator. Jeder Abzweig ist einzeln abgesichert, die Masse wird sternförmig
+  verbunden.
+- **Der Pi schaltet den Rest:** Ein Netzrelais an GPIO 17 schaltet das RS-150-5 und den
+  Verstärker. Ist der Pi aus, ist damit alles aus, auch das 16er-Relaisboard (keine
+  Spulenspannung). Das Relais wird vom 5-V-Pin des Pi versorgt, nicht vom Netzteil, das es
+  schaltet.
+- **Der Pi hat ein eigenes Netzteil** (offiziell, 27 W). Sonst drohen Unterspannung durch
+  LED- und Relaislast, ein USB-Limit von 600 mA ohne PD und Störungen im Audio.
+- **LED-Streifen nur rot, 10 × 60 WS2812B**, je zwei Rücken an Rücken parallel an einer
+  Datenleitung. Die Pico-Konfiguration bleibt bei 5 × 60 LEDs. Nur Rot drittelt den
+  Höchststrom (12 statt 36 A), sodass das Netzteil auch ohne Helligkeitsbegrenzung reicht.
+- **LED-Matrix 64×8** (zwei MAX7219-Module 4-in-1) direkt am SPI0 des Pi, über einen
+  74AHCT125. Ein weiterer Mikrocontroller ist nicht nötig, SPI kollidiert nicht mit dem DAC.
+
+**Für die nächsten Meilensteine:**
+- **Meilenstein 6:**
+  - Das LED-Format braucht nur ein Byte pro LED (Rot). Das drittelt die Datenmenge und
+    entschärft das Bandbreitenproblem von `L <hex>`. Mit 300 LEDs sind es 300 Byte pro Frame.
+  - Die Pico-Firmware setzt Grün und Blau fest auf 0 und erzwingt `brightness`. Das ist
+    Absicherung, nicht Komfort: Weiß würde das Netzteil überlasten.
+- **Netzrelais** (vor dem ersten Aufbau):
+  - `gpio=17=op,dh` in `config.txt` und `POWER_OFF_ON_HALT=1` im EEPROM über `setup.sh` setzen.
+  - Prüfen, dass das Relais nach dem Herunterfahren abfällt.
+  - Die Software muss das Netzrelais nicht schalten. Es folgt allein dem Zustand des Pi.
+- **Matrix** (Meilenstein noch offen):
+  - `dtparam=spi=on` in `setup.sh`
+  - Ansteuerung mit `spidev` (wenige Register) oder `luma.led_matrix`
+  - Frames nur bei Änderung senden
+  - Beim Beenden löschen, weil der MAX7219 sein Bild hält
+  - Ein eigener Abschnitt in `config.yaml` (SPI-Bus, Anzahl Module, Drehung, Helligkeit)
+
 ## Offene Punkte aus Meilenstein 0
 
 - **DAC** fehlt noch (höhere Stiftleiste). Danach: Hörtest, DAC-Pegel auf 100 %, prüfen, dass
