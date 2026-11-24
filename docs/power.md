@@ -5,14 +5,15 @@ Teile: [parts.md](parts.md), Pins: [pins.md](pins.md).
 ## Überblick
 
 ```
-230 V ── Kaltgerätebuchse ── Notaus ──┬── Pi-Netzteil (27 W, USB-C) ── Pi 5 ── GPIO 17 ──┐
-         (Schalter, Sicherung)        │                                                 │ steuert
-                                      ├── Netzrelais ──┬── 5-V-Netzteil RS-150-5 ── Sicherungsverteiler ── 5-V-Verbraucher
-                                      │                └── Verstärker (2.1)
-                                      └── Relaiskontakte des 16er-Boards ── Ventilatoren, Fernseher,
-                                                                            später Strobos, Nebelmaschine, Diskokugel
+Festival-Steckdose ── PRCD ── Zuleitung ── Kaltgerätebuchse ── Notaus ──┬── Pi-Netzteil (27 W, USB-C) ── Pi 5 ── GPIO 17 ──┐
+                                            (Schalter, Sicherung)        │                                                 │ steuert
+                                                                         ├── Netzrelais ──┬── 5-V-Netzteil RS-150-5 ── Sicherungsverteiler ── 5-V-Verbraucher
+                                                                         │                └── Verstärker (2.1)
+                                                                         └── Relaiskontakte des 16er-Boards ── Ventilatoren, Fernseher,
+                                                                                                               später Strobos, Nebelmaschine, Diskokugel
 ```
 
+- **PRCD:** Fehlerstromschutz 30 mA direkt an der Festival-Steckdose, siehe unten.
 - **Notaus:** trennt alles vom Netz.
 - **An/Aus-Knopf:** schaltet den Pi (Taster an den Lötpads `J2` des Pi 5). Alles andere
   folgt ihm:
@@ -64,6 +65,19 @@ Teile: [parts.md](parts.md), Pins: [pins.md](pins.md).
 - **Wärme:** Bei 5 V liefert es ab 40 °C Umgebung weniger Leistung, bei 70 °C noch 50 %. Bei
   der erwarteten Last von etwa 50 % reicht das bis 70 °C. Es braucht trotzdem Luft und darf
   nicht unter Polster oder in eine geschlossene Kiste.
+
+### Elektronikbox
+
+In der Box entstehen etwa 15 – 25 W Abwärme: RS-150-5 ≈ 8 W, Pi 5 ≈ 5 – 10 W, Pi-Netzteil
+≈ 2 W, Relaisspulen bis 6 W. Geschlossen würde eine Holzbox dadurch grob 10 – 15 °C wärmer als
+die Umgebung.
+- **Lüftungsöffnungen:** Zuluft unten, Abluft oben, auf gegenüberliegenden Seiten, sodass die Luft
+  am Netzteil und am Pi vorbeiströmt. Die warme Luft steigt von selbst nach oben, ein Lüfter ist
+  vorerst nicht vorgesehen.
+- Falls es doch zu warm wird: Ein Gehäuselüfter an der Abluft, der nach außen bläst, kann an 5 V
+  aus dem RS-150-5 laufen (Logik-Abzweig). Viele 12-V-Lüfter laufen an 5 V nicht zuverlässig an,
+  dann eine 5-V-Version nehmen.
+- Box nicht in die pralle Sonne stellen.
 
 ### Strombedarf
 
@@ -119,6 +133,22 @@ Wenn der Pi doch ans RS-150-5 soll: eigene dicke Leitung direkt von den Klemmen,
 
 ## 230-V-Seite
 
+- **PRCD** (as-Schwabe 45230: 30 mA, Typ A, 16 A, IP44, nach HD 639) als Zwischenstecker direkt
+  an der Festival-Steckdose:
+  - Er schützt Personen bei einem Fehlerstrom, auch wenn die Festival-Verteilung selbst keinen
+    funktionierenden FI hat. Löst er aus, bleibt der Rest der Festival-Verteilung am Netz.
+  - Auch beim Aufbauen und Testen zu Hause verwenden, gerade wenn dort kein FI eingebaut ist.
+  - **Nach einem Stromausfall muss vermutlich RESET gedrückt werden.** Das Auto bleibt bis dahin
+    aus, danach startet alles von selbst. Den PRCD deshalb gut erreichbar anbringen und den Leuten
+    vor Ort Bescheid geben.
+  - Vor jedem Festivaltag die TEST-Taste drücken.
+  - Umgebungstemperatur höchstens 40 °C: in den Schatten, nicht in die Elektronikbox.
+  - Kein PRCD-S, also keine Prüfung des Schutzleiters. Ob er funktioniert, beim Aufbauteam des
+    Festivals nachfragen.
+  - IP44 gilt nur mit eingestecktem Stecker und geschlossener Klappe. Nicht auf den Boden legen,
+    wo sich Wasser sammelt.
+- **Zuleitung:** Gummischlauchleitung H07RN-F 3G1,5 mit spritzwassergeschützten Kupplungen
+  (IP44), keine Haushaltsverlängerung aus PVC.
 - **Netzklemmen abdecken.** Beim RS-150 liegen sie offen. Zugentlastung an allen Netzleitungen,
   Schutzleiter an Netzteil-FG und an alle berührbaren Metallteile (Alurohre!).
 - **Relaisboard:** Die Kontakte schalten 230 V (Ventilatoren, Fernseher). Bei billigen Boards ist

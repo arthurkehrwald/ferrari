@@ -88,6 +88,8 @@ weiteres USB-Gerät braucht es einen aktiven Hub.
 |---|---|---|---|
 | Mean Well RS-150-5 (5 V, 26 A) | 1 | alle 5-V-Verbraucher außer dem Pi | kaufen |
 | Netzrelais-Modul, 1 Kanal, 5-V-Spule, 3,3-V-Eingang, Kontakt ≥ 16 A / 250 V (oder SSR mit Nullspannungsschaltung ≥ 25 A) | 1 | schaltet RS-150-5 und Verstärker mit dem Pi | kaufen |
+| PRCD-Zwischenstecker as-Schwabe 45230 (30 mA, Typ A, IP44) | 1 | Fehlerstromschutz an der Festival-Steckdose, siehe power.md | kaufen |
+| Zuleitung H07RN-F 3G1,5 mit Schukostecker und IP44-Kupplung | Länge nach Bedarf | Festival-Steckdose → Auto | ? |
 | Kaltgerätebuchse mit Schalter und Sicherungshalter + Sicherung 3,15 A träge | 1 | Netzeingang | ? |
 | Notaus-Pilzschalter, rastend, 2-polig, ≥ 10 A / 230 V | 1 | rechts von der Mittelkonsole | ? |
 | Mehrfachsteckdose oder Verteilung 230 V | 1 | ungeschaltet: Pi-Netzteil, Relaiskontakte. Geschaltet: RS-150-5, Verstärker | ? |
